@@ -1,1 +1,48 @@
+#!/bin/bash
+
+# Script to create a new user account, home directory, and set a password in Linux
+
+# Check if the script is executed with root privileges
+if [[ "$EUID" -ne 0 ]]; then
+  echo "Error: This script must be run with root privileges."
+  exit 1
+fi
+
+# Prompt for username
+read -p "Enter the username for the new user: " USERNAME
+
+# Check if the username is provided
+if [[ -z "$USERNAME" ]]; then
+  echo "Error: Username must be provided."
+  exit 1
+fi
+
+# Check if the username already exists
+if id "$USERNAME" &>/dev/null; then
+  echo "Error: The username '$USERNAME' already exists."
+  exit 1
+fi
+
+# Create the user with the home directory
+useradd -m "$USERNAME"
+
+# Check if the user creation was successful
+if [[ "$?" -ne 0 ]]; then
+  echo "Error: Failed to create the user '$USERNAME'."
+  exit 1
+fi
+
+# Set the password for the new user
+echo "Setting password for user '$USERNAME':"
+passwd "$USERNAME"
+
+# Check if the password was set successfully
+if [[ "$?" -ne 0 ]]; then
+  echo "Error: Failed to set the password for user '$USERNAME'."
+  exit 1
+fi
+
+# Display success message
+echo "User account '$USERNAME' created successfully with a home directory and password set."
+exit 0
 
